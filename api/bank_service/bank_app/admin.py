@@ -8,7 +8,5 @@ admin.site.register(Employee)
 admin.site.register(Atm)
 admin.site.register(Bank)
 admin.site.register(BankBranch)
-admin.site.register(Account)
-admin.site.register(Transaction)
 
 
