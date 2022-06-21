@@ -15,7 +15,7 @@ class BankBranch(models.Model):
 class Customer(models.Model):
     name = models.CharField(max_length=264, unique=True)
 
-class CustomerRegister(models.Model):
+class Account(models.Model):
     bank_id = models.ForeignKey(Bank, on_delete=models.CASCADE)
     bank_branch_id = models.ForeignKey(BankBranch, on_delete=models.CASCADE)
     customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
@@ -26,9 +26,8 @@ class Employee(models.Model):
     bank_branch_id = models.ForeignKey(BankBranch, on_delete=models.CASCADE)
 
 class Transaction(models.Model):
-    bank_id = models.ForeignKey(Bank, on_delete=models.CASCADE)
-    bank_branch_id = models.ForeignKey(BankBranch, on_delete=models.CASCADE)
     customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    branch_id = models.ForeignKey(BankBranch, on_delete=models.CASCADE)
     atm_id = models.ForeignKey(Atm, on_delete=models.CASCADE)
-    operation = models.CharField(max_length=264, unique=True)
+    operation = models.CharField(max_length=264, unique=False)
     amount = models.DecimalField(max_digits=7, decimal_places=2)
