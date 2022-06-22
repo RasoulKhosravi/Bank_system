@@ -1,30 +1,37 @@
 from pyexpat import model
 from rest_framework import serializers
 
-from bank_app.models import Account, Employee, Transaction
+from bank_app.models import Account, Atm, Employee, Transaction
 
 class TranactionSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
-        operations = ['withdraw', 'deposit']
+        operations = ['withdraw', 'deposit', 'card_to_card']
+
         if attrs['operation'] not in  operations:
             raise serializers.ValidationError("your operation is not valid")
 
-        customer_id = attrs['customer_id'].id
-        bank_id = attrs['branch_id'].bank_id.id
-        account = Account.objects.filter(bank_id = bank_id).filter(customer_id = customer_id)
-        if not account:
-            raise serializers.ValidationError("you dont have any account in this bank")
+        branch = attrs['bank_branch_id']
+        if attrs['operation'] == 'card_to_card':
+            atm = Atm.objects.filter(bank_branch_id = branch.id)
+            if not atm:
+                raise serializers.ValidationError("this branch dosent have any atm")
+       
+        if attrs['operation'] != 'card_to_card':
+            branch_bank_id = attrs['bank_branch_id'].bank_id.id
+            account_bank_id = attrs['account_id'].bank_id.id
+            if branch_bank_id != account_bank_id:
+                raise serializers.ValidationError("you dont have an account in this bank")
 
-        branch_id = attrs['branch_id'].id
-        employees = Employee.objects.filter(bank_branch_id = branch_id).filter(operation = attrs['operation'])
-        if not employees:
-            raise serializers.ValidationError("this operation is not avilable in this branch")
-
+            employees = Employee.objects.filter(bank_branch_id = branch.id).filter(operation = attrs['operation'])
+            if not employees:
+                raise serializers.ValidationError("this operation is not avilable in this branch")
+      
         return attrs
 
     class Meta:
         model = Transaction
-        fields = ('branch_id', 'customer_id', 'atm_id', 'operation', 'amount')
+        fields = ('id', 'bank_branch_id', 'account_id', 'operation', 'amount')
+
 
 class AccountSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
@@ -46,4 +53,4 @@ class AccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ('bank_id', 'bank_branch_id', 'customer_id')
+        fields = ('id', 'bank_id', 'bank_branch_id', 'customer_id')
