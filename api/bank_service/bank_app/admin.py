@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from bank_app.models import Atm, Bank, BankBranch, Customer, Employee, Transaction
+from bank_app.models import Account, Atm, Bank, BankBranch, Customer, Employee, Transaction
 
 class BankBranchAdmin(admin.ModelAdmin):
     list_display = ('name', 'bank_id')
@@ -22,6 +22,9 @@ class TransactionAdmin(admin.ModelAdmin):
          "operation"
     ]
     pass
+class AccountAdmin(admin.ModelAdmin):
+    list_display = ('bank_branch_id', 'customer_id')
+    pass
 
 admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(Atm, AtmAdmin)
@@ -29,3 +32,4 @@ admin.site.register(Customer)
 admin.site.register(Bank)
 admin.site.register(BankBranch, BankBranchAdmin)
 admin.site.register(Transaction, TransactionAdmin)
+admin.site.register(Account, AccountAdmin)

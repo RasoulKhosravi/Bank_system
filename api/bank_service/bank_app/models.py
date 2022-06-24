@@ -26,16 +26,12 @@ class Customer(models.Model):
         return self.name
 
 class Account(models.Model):
-    bank_id = models.ForeignKey(Bank, on_delete=models.CASCADE)
     bank_branch_id = models.ForeignKey(BankBranch, on_delete=models.CASCADE)
     customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    def __str__(self):
-        return self.customer_id.name
-    
 
 class Employee(models.Model):
     name = models.CharField(max_length=264, unique=True)
-    operation = models.CharField(max_length=264, unique=True)
+    operation = models.CharField(max_length=264)
     bank_branch_id = models.ForeignKey(BankBranch, on_delete=models.CASCADE)
     def __str__(self):
         return self.name + " ("+self.bank_branch_id.name+ self.operation+")"

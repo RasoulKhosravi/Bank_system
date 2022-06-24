@@ -17,9 +17,9 @@ class TranactionSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("this branch dosent have any atm")
        
         if attrs['operation'] != 'card_to_card':
-            branch_bank_id = attrs['bank_branch_id'].bank_id.id
-            account_bank_id = attrs['account_id'].bank_id.id
-            if branch_bank_id != account_bank_id:
+            requst_branch_bank_id = branch.bank_id.id
+            account_bank_id = attrs['account_id'].bank_branch_id.bank_id.id
+            if requst_branch_bank_id != account_bank_id:
                 raise serializers.ValidationError("you dont have an account in this bank")
 
             employees = Employee.objects.filter(bank_branch_id = branch.id).filter(operation = attrs['operation'])
@@ -35,15 +35,11 @@ class TranactionSerializer(serializers.ModelSerializer):
 
 class AccountSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
-        bank = attrs['bank_id']
         branch = attrs['bank_branch_id']
-        if bank.id != branch.bank_id.id:
-            raise serializers.ValidationError("this branch is not for this bank")
-
         customer_id = attrs['customer_id'].id
-        account = Account.objects.filter(bank_id = bank.id).filter(customer_id = customer_id)
+        account = Account.objects.filter(bank_branch_id = branch.id).filter(customer_id = customer_id)
         if account:
-            raise serializers.ValidationError("you have alreday an acconut in this bank")
+            raise serializers.ValidationError("you have alreday an acconut in this branch")
 
         employees = Employee.objects.filter(bank_branch_id = branch.id).filter(operation = 'opening_account')
         if not employees:
@@ -53,4 +49,4 @@ class AccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ('id', 'bank_id', 'bank_branch_id', 'customer_id')
+        fields = ('id', 'bank_branch_id', 'customer_id')
